@@ -43,7 +43,6 @@ describe("read:", function () {
 
   describe("#addMatcher", function () {
     it ("responds to the first matched handler", function (done) {
-      
       read.addMatcher(/bb/, function (path, callback) {
         callback('This is an unmatched handler. This should not be called', null);
       });
@@ -61,62 +60,50 @@ describe("read:", function () {
         body.should.equal('aa');
         done();
       });
-      
     });
   });
   
   
   it("reads files from the file system", function (done) {
-  
     read(fsFile, function (err, body) {
       should.not.exist(err);
       body.should.equal(fsFileContent);
       done();
     });
-    
   });
   
   
   it("reports an error when read from file system fails", function (done) {
-  
     read('test/non-existant.file', function (err, body) {
       should.exist(err);
       done();
     });
-    
   });
   
   
   it("reads files from HTTP", function (done) {
-  
     read(httpUrl, function (err, body) {
       should.not.exist(err);
       body.should.equal(fsFileContent);
       done();
     });
-    
   });
   
   it("reports an error when read is invoked on non-existant http source", function (done) {
-  
     read('http://nonexistant:11', function (err, body) {
       should.exist(err);
       done();
     });
-    
   });
   
   it("reports an error when read is invoked on malformed url", function (done) {
-  
     read('http://#malformed', function (err, body) {
       should.exist(err);
       done();
     });
-    
   });
   
   it("reads files from HTTPS", function (done) {
-    
     read(httpsUrl, function (err, body) {
       should.not.exist(err);
       body.should.equal(fsFileContent);
