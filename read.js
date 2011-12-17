@@ -1,3 +1,9 @@
+var pattern = {
+  http: /^http\:\/\//,
+  https: /^https\:\/\//,
+  fs: /.*/
+}
+
 function read(path, doneFn)
 {
   var handlers = read.handlers,
@@ -22,7 +28,36 @@ read.addMatcher = function (pattern, handler) {
 }
 
 read.clearCustomMatchers = function () {
-  read.handlers = []
+  read.handlers = [];
+  addDefaultReadHandlers();
 }
 
+function addDefaultReadHandlers()
+{
+  addFSReadHandler();
+  //addHTTPReadHandler();
+  //addHTTPSReadHandler();
+}
+
+function addFSReadHandler()
+{
+  read.addMatcher(/./, function (path, done) {
+  
+    require('fs').readFile(path, function (err, data) {
+      data = data ? data.toString() : null
+      done(err, data);
+    });
+    
+  });
+}
+
+/*
+function addHTTPReadHandler()
+{
+}
+
+function addHTTPSReadHandler()
+{
+}
+*/
 module.exports = read
