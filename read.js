@@ -72,6 +72,12 @@ addDefaultMatcher(Pattern.url, function (path, done) {
     res.on('close', function (err) {
       done(err, null);
     });
+  }).
+  on('error', function (err) {
+    done(err, null);
+  }).
+  setTimeout(read.timeout || 100, function () {
+    done('No response recieved from Server!', null);
   });
 });
 

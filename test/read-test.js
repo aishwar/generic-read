@@ -5,18 +5,22 @@ var fs = require('fs'),
     http = require('http'),
     https = require('https');
 
-var fsFile = __dirname + '/fixture.txt',
-    httpFile = 'http://localhost:8080',
-    httpsFile = 'https://localhost:8443';
+var fsFile = 'test/fixtures/content.txt',
+    httpUrl = 'http://localhost:8080',
+    httpsUrl = 'https://localhost:8443';
 
 var fsFileContent = fs.readFileSync(fsFile).toString(),
+
     httpServer = http.createServer(function (req, res) {
       res.end(fsFileContent);
     }).listen(8080),
-    httpsServer = https.createServer(function (req, res) {
+    
+    httpsServer = https.createServer({
+      key: fs.readFileSync('test/fixtures/privatekey.pem'),
+      cert: fs.readFileSync('test/fixtures/certificate.pem')
+    }, function (req, res) {
       res.end(fsFileContent);
     }).listen(8443);
-
 
 
 
@@ -39,6 +43,10 @@ describe("read:", function () {
 
   describe("#addMatcher", function () {
     it ("responds to the first matched handler", function (done) {
+      
+      read.addMatcher(/bb/, function (path, callback) {
+        callback('This is an unmatched handler. This should not be called', null);
+      });
       
       read.addMatcher(/aa/, function (path, callback) {
         callback(null, 'aa');
@@ -68,16 +76,53 @@ describe("read:", function () {
     
   });
   
+  
+  it("reports an error when read from file system fails", function (done) {
+  
+    read('test/non-existant.file', function (err, body) {
+      should.exist(err);
+      done();
+    });
+    
+  });
+  
+  
   it("reads files from HTTP", function (done) {
   
-    read(httpFile, function (err, body) {
+    read(httpUrl, function (err, body) {
       should.not.exist(err);
       body.should.equal(fsFileContent);
       done();
     });
     
   });
-  //it("reads files from HTTPS", function (done) {});
+  
+  it("reports an error when read is invoked on non-existant http source", function (done) {
+  
+    read('http://nonexistant:11', function (err, body) {
+      should.exist(err);
+      done();
+    });
+    
+  });
+  
+  it("reports an error when read is invoked on malformed url", function (done) {
+  
+    read('http://#malformed', function (err, body) {
+      should.exist(err);
+      done();
+    });
+    
+  });
+  
+  it("reads files from HTTPS", function (done) {
+    
+    read(httpsUrl, function (err, body) {
+      should.not.exist(err);
+      body.should.equal(fsFileContent);
+      done();
+    });
+  });
   
   
   after(function () {
