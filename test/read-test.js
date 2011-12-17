@@ -27,22 +27,24 @@ describe("read", function () {
     read.clearCustomMatchers();
   });
 
-  describe("addMatcher", function () {
-    it ("responds to a matched handler", function (done) {
-    
-      read.addMatcher(/a/, function (path, callback) {
-        callback(null, 'done');
+  describe("#addMatcher", function () {
+    it ("responds to the first matched handler", function (done) {
+      
+      read.addMatcher(/aa/, function (path, callback) {
+        callback(null, 'aa');
       });
       
-      read('a', function (err, body) {
+      read.addMatcher(/aa/, function (path, callback) {
+        callback('Should not run 2nd matched handler', null);
+      });
+      
+      read('aa', function (err, body) {
         should.not.exist(err);
-        body.should.equal('done');      
+        body.should.equal('aa');
         done();
       });
       
     });
-    
-    //it ("responds to only one matched handler", functin (done) {});
   });
 
   describe("read", function () {

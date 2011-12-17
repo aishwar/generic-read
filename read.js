@@ -1,4 +1,4 @@
-var pattern = {
+var Pattern = {
   http: /^http\:\/\//,
   https: /^https\:\/\//,
   fs: /.*/
@@ -6,10 +6,23 @@ var pattern = {
 
 function read(path, doneFn)
 {
-  var handlers = read.handlers,
-      n = handlers.length - 1;
+  var handlers = read.customHandlers,
+      n = handlers.length;
   
-  for (var i = n; i >= 0; i--)
+  // Go through the custom handlers first
+  for (var i = 0; i < n; i++)
+  {
+    if (handlers[i].pattern.test(path))
+    {
+      return handlers[i].handler(path, doneFn);
+    }
+  }
+  
+  handlers = defaultHandlers;
+  n = handlers.length;
+  
+  // If unhandled by custom matchers, check against the default matchers
+  for (var i = 0; i < n; i++)
   {
     if (handlers[i].pattern.test(path))
     {
@@ -18,46 +31,34 @@ function read(path, doneFn)
   }
 }
 
-read.handlers = [ /* { pattern: regex, handler: fn } */ ];
+read.customHandlers = [ /* { pattern: regex, handler: fn } */ ];
 
 read.addMatcher = function (pattern, handler) {
-  read.handlers.push({
+  read.customHandlers.push({
     pattern:pattern,
     handler:handler
   });
 }
 
 read.clearCustomMatchers = function () {
-  read.handlers = [];
-  addDefaultReadHandlers();
+  read.customHandlers = [];
 }
 
-function addDefaultReadHandlers()
-{
-  addFSReadHandler();
-  //addHTTPReadHandler();
-  //addHTTPSReadHandler();
-}
+var defaultHandlers = [];
 
-function addFSReadHandler()
+function addDefaultMatcher(pattern, handler)
 {
-  read.addMatcher(/./, function (path, done) {
-  
-    require('fs').readFile(path, function (err, data) {
-      data = data ? data.toString() : null
-      done(err, data);
-    });
-    
+  defaultHandlers.push({
+    pattern:pattern,
+    handler:handler
   });
 }
 
-/*
-function addHTTPReadHandler()
-{
-}
+addDefaultMatcher(Pattern.fs, function (path, done) {
+  require('fs').readFile(path, function (err, data) {
+    data = data ? data.toString() : null
+    done(err, data);
+  });
+});
 
-function addHTTPSReadHandler()
-{
-}
-*/
 module.exports = read
