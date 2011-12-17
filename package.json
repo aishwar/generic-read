@@ -1,7 +1,7 @@
 {
 "name":"generic-read",
-"version":"0.1.0",
+"version":"0.1.1",
 "description":"An unified interface to read data from multiple sources",
 "author":"Aishwar Muthuraman <aishwar@gmail.com> (http://floatingpoint.ca/)",
-"main":"read.js"
+"main":"generic-read.js"
 }
