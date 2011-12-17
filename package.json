@@ -1,5 +1,5 @@
 {
-"name":"read",
+"name":"generic-read",
 "version":"0.1.0",
 "description":"An unified interface to read data from multiple sources",
 "author":"Aishwar Muthuraman <aishwar@gmail.com> (http://floatingpoint.ca/)",

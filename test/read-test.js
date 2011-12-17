@@ -1,5 +1,5 @@
 var should = require('should'),
-    read = require('../read');
+    read = require('../generic-read');
 
 var fs = require('fs'),
     http = require('http'),
