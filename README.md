@@ -10,26 +10,26 @@ Examples:
 
 Include the package:
 
-  var read = require('generic-read');
+    var read = require('generic-read');
 
 Reading from the file system:
 
-  read('test.txt', function (err, body) {
-    if (err) throw err;
-    console.log(body);
-  });
+    read('test.txt', function (err, body) {
+      if (err) throw err;
+      console.log(body);
+    });
 
 Reading from HTTP:
 
-  read('http://www.google.com/', function (err, body) {
-    if (err) throw err;
-    console.log(body);
-  });
+    read('http://www.google.com/', function (err, body) {
+      if (err) throw err;
+      console.log(body);
+    });
 
 Reading from HTTPS:
 
-  read('https://www.google.com/', function (err, body) {
-    if (err) throw err;
-    console.log(body);
-  });
+    read('https://www.google.com/', function (err, body) {
+      if (err) throw err;
+      console.log(body);
+    });
 
