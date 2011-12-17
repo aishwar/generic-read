@@ -1,6 +1,5 @@
 var Pattern = {
-  http: /^http\:\/\//,
-  https: /^https\:\/\//,
+  url: /^http[s]?\:\/\//,
   fs: /.*/
 }
 
@@ -53,6 +52,28 @@ function addDefaultMatcher(pattern, handler)
     handler:handler
   });
 }
+
+addDefaultMatcher(Pattern.url, function (path, done) {
+  var url = require('url'),
+      opts = url.parse(path),
+      requestor = opts.protocol.indexOf('https') > -1 ? require('https') : require('http');
+  
+  requestor.get(url.parse(path), function (res) {
+    var output = '';
+    
+    res.on('data', function (chunk) {
+      output += chunk;
+    });
+    
+    res.on('end', function () {
+      done(null, output);
+    });
+    
+    res.on('close', function (err) {
+      done(err, null);
+    });
+  });
+});
 
 addDefaultMatcher(Pattern.fs, function (path, done) {
   require('fs').readFile(path, function (err, data) {

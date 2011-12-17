@@ -6,12 +6,25 @@ var fs = require('fs'),
     https = require('https');
 
 var fsFile = __dirname + '/fixture.txt',
-    httpFile = 'http://www.google.com/',
-    httpsFile = 'https://www.google.com/';
+    httpFile = 'http://localhost:8080',
+    httpsFile = 'https://localhost:8443';
 
-var fsFileContent = fs.readFileSync(fsFile);
+var fsFileContent = fs.readFileSync(fsFile).toString(),
+    httpServer = http.createServer(function (req, res) {
+      res.end(fsFileContent);
+    }).listen(8080),
+    httpsServer = https.createServer(function (req, res) {
+      res.end(fsFileContent);
+    }).listen(8443);
 
-describe("read", function () {
+
+
+
+describe("read:", function () {
+  beforeEach(function () {
+    read.clearCustomMatchers();
+  });
+
 
   describe("interface", function () {
     it ("provides an addMatcher method", function () {
@@ -22,10 +35,7 @@ describe("read", function () {
       should.exist(read.clearCustomMatchers)
     });
   });
-  
-  beforeEach(function () {
-    read.clearCustomMatchers();
-  });
+
 
   describe("#addMatcher", function () {
     it ("responds to the first matched handler", function (done) {
@@ -46,21 +56,32 @@ describe("read", function () {
       
     });
   });
-
-  describe("read", function () {
-    it("reads files from the file system", function (done) {
-    
-      read(fsFile, function (err, body) {
-        should.not.exist(err);
-        body.should.equal(fsFileContent.toString());
-        done();
-      });
-      
+  
+  
+  it("reads files from the file system", function (done) {
+  
+    read(fsFile, function (err, body) {
+      should.not.exist(err);
+      body.should.equal(fsFileContent);
+      done();
     });
     
-    //it("reads files from HTTP", function (done) {});
-    //it("reads files from HTTPS", function (done) {});
+  });
+  
+  it("reads files from HTTP", function (done) {
+  
+    read(httpFile, function (err, body) {
+      should.not.exist(err);
+      body.should.equal(fsFileContent);
+      done();
+    });
     
   });
-
+  //it("reads files from HTTPS", function (done) {});
+  
+  
+  after(function () {
+    httpServer.close();
+    httpsServer.close();
+  });
 });
